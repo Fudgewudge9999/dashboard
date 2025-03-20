@@ -488,339 +488,224 @@ export function ResourcesView() {
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">
-      <h1 className="text-2xl font-bold mb-6">Resources</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Categories</h2>
-              <AppButton 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setIsAddCategoryModalOpen(true)}
-              >
-                <Plus size={16} />
-              </AppButton>
-            </div>
-            
-            <div className="space-y-1 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-medium">Resources</h1>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <AppButton 
+            variant="outline"
+            onClick={() => setIsAddCategoryModalOpen(true)}
+            className="flex-1 sm:flex-initial"
+          >
+            <FolderPlus className="mr-2 h-4 w-4" />
+            New Category
+          </AppButton>
+          <AppButton 
+            onClick={() => setShowAddResourceModal(true)}
+            className="flex-1 sm:flex-initial"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            New Resource
+          </AppButton>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        {/* Categories as horizontal tabs */}
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="w-full overflow-x-auto pb-2">
+            <div className="flex gap-2 min-w-max">
               <button
-                className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
-                  selectedCategory === null ? "bg-primary/10 text-primary" : "hover:bg-gray-100"
+                className={`px-3 py-2 rounded-md transition-colors ${
+                  selectedCategory === null 
+                    ? "bg-primary text-primary-foreground" 
+                    : "bg-muted hover:bg-muted/80"
                 }`}
-                onClick={() => setSelectedCategory(null)}
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setSelectedSubcategory(null);
+                }}
               >
                 All Resources
               </button>
               {categories.map((category) => (
-                <div
+                <button
                   key={category.id}
-                  className="space-y-1"
+                  className={`px-3 py-2 rounded-md transition-colors group relative ${
+                    selectedCategory === category.id 
+                      ? "bg-primary text-primary-foreground" 
+                      : "bg-muted hover:bg-muted/80"
+                  }`}
+                  onClick={() => {
+                    setSelectedCategory(category.id);
+                    setSelectedSubcategory(null);
+                  }}
                 >
-                  <div
-                    className={`group flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
-                      selectedCategory === category.id ? "bg-primary/10 text-primary" : "hover:bg-gray-100"
-                    }`}
+                  <span>{category.name}</span>
+                  <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-white/20">
+                    {category.count}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingCategory(category);
+                      setIsEditCategoryModalOpen(true);
+                    }}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <button
-                      className="flex-1 text-left flex items-center justify-between"
-                      onClick={() => {
-                        setSelectedCategory(category.id);
-                        setSelectedSubcategory(null);
-                      }}
-                    >
-                      <span>{category.name}</span>
-                      <span className="text-xs text-muted-foreground bg-gray-100 px-2 py-1 rounded-full">
-                        {category.count}
-                      </span>
-                    </button>
-                    <div className="relative ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowCategoryActionsFor(showCategoryActionsFor === category.id ? null : category.id);
-                        }}
-                        className="p-1 hover:bg-gray-100 rounded-full"
-                      >
-                        <MoreVertical size={14} />
-                      </button>
-                      
-                      {showCategoryActionsFor === category.id && (
-                        <div className="absolute right-0 mt-1 w-36 bg-white rounded-md shadow-lg z-10 border">
-                          <div className="py-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingCategory(category);
-                                setIsEditCategoryModalOpen(true);
-                                setShowCategoryActionsFor(null);
-                              }}
-                              className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              <Edit size={14} className="mr-2" />
-                              Edit
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setIsAddSubcategoryModalOpen(true);
-                                setShowCategoryActionsFor(null);
-                              }}
-                              className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              <FolderPlus size={14} className="mr-2" />
-                              Add Subcategory
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (category.count > 0) {
-                                  toast.error("Cannot delete category with resources. Remove resources first.");
-                                  setShowCategoryActionsFor(null);
-                                  return;
-                                }
-                                
-                                if (confirm('Are you sure you want to delete this category?')) {
-                                  handleDeleteCategory(category.id);
-                                }
-                                setShowCategoryActionsFor(null);
-                              }}
-                              className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-gray-100"
-                            >
-                              <Trash2 size={14} className="mr-2" />
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Subcategories */}
-                  {selectedCategory === category.id && (
-                    <div className="ml-4 space-y-1">
-                      {subcategories
-                        .filter(sub => sub.category_id === category.id)
-                        .map(subcategory => (
-                          <div
-                            key={subcategory.id}
-                            className={`group flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
-                              selectedSubcategory === subcategory.id ? "bg-primary/10 text-primary" : "hover:bg-gray-100"
-                            }`}
-                          >
-                            <button
-                              className="flex-1 text-left flex items-center"
-                              onClick={() => setSelectedSubcategory(subcategory.id)}
-                            >
-                              <span className="text-sm">{subcategory.name}</span>
-                            </button>
-                            <div className="relative ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setShowSubcategoryActionsFor(showSubcategoryActionsFor === subcategory.id ? null : subcategory.id);
-                                }}
-                                className="p-1 hover:bg-gray-100 rounded-full"
-                              >
-                                <MoreVertical size={14} />
-                              </button>
-                              
-                              {showSubcategoryActionsFor === subcategory.id && (
-                                <div className="absolute right-0 mt-1 w-36 bg-white rounded-md shadow-lg z-10 border">
-                                  <div className="py-1">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setEditingSubcategory(subcategory);
-                                        setIsEditSubcategoryModalOpen(true);
-                                        setShowSubcategoryActionsFor(null);
-                                      }}
-                                      className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    >
-                                      <Edit size={14} className="mr-2" />
-                                      Edit
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (confirm('Are you sure you want to delete this subcategory?')) {
-                                          handleDeleteSubcategory(subcategory.id);
-                                        }
-                                        setShowSubcategoryActionsFor(null);
-                                      }}
-                                      className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-gray-100"
-                                    >
-                                      <Trash2 size={14} className="mr-2" />
-                                      Delete
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
+                    <Pencil className="h-3 w-3" />
+                  </button>
+                </button>
               ))}
-            </div>
-            
-            <div className="pt-4 border-t">
-              <AppButton 
-                icon={<Plus size={18} />}
-                onClick={() => setShowAddResourceModal(true)}
-                disabled={categories.length === 0}
-              >
-                Add Resource
-              </AppButton>
             </div>
           </div>
         </div>
-        
-        <div className="md:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">
-                {selectedCategory 
-                  ? categories.find(c => c.id === selectedCategory)?.name 
-                  : "All Resources"}
-              </h2>
-              <div className="flex gap-2">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search resources..."
-                    className="pl-8 h-9 w-[200px] rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <AppButton onClick={() => setShowAddResourceModal(true)}>
-                  Add Resource
-                </AppButton>
-              </div>
+
+        {/* Search and Sort */}
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <div className="relative flex-1 w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search resources..."
+                className="w-full pl-9 h-10 rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            
-            {isLoadingResources ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
-            ) : sortedResources.length === 0 ? (
-              <div className="text-center py-12">
-                <Folder className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-medium">No resources found</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {selectedCategory
-                    ? "There are no resources in this category yet."
-                    : searchQuery
-                    ? "No resources match your search."
-                    : "There are no resources yet."}
-                </p>
-                <AppButton
-                  onClick={() => setShowAddResourceModal(true)}
-                  className="mt-4"
-                >
-                  Add your first resource
-                </AppButton>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {sortedResources.map((resource) => (
-                  <div
-                    key={resource.id}
-                    className="group flex items-start p-4 border rounded-lg hover:bg-gray-50 transition-colors relative"
-                  >
-                    <div className="mr-4 mt-1">
-                      {resource.type === "document" ? (
-                        <File className="h-8 w-8 text-blue-500" />
-                      ) : resource.type === "spreadsheet" ? (
-                        <File className="h-8 w-8 text-green-500" />
-                      ) : (
-                        <Link className="h-8 w-8 text-purple-500" />
-                      )}
-                    </div>
-                    <div className="flex-1" onClick={() => handleResourceClick(resource)}>
-                      <h3 className="font-medium">{resource.title}</h3>
-                      {resource.description && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {resource.description}
-                        </p>
-                      )}
-                      <div className="flex items-center mt-2 text-xs text-muted-foreground">
-                        <span>
-                          {new Date(resource.created_at).toLocaleDateString('en-GB')}
-                        </span>
-                        {resource.file_size && (
-                          <>
-                            <span className="mx-2">•</span>
-                            <span>{formatFileSize(resource.file_size)}</span>
-                          </>
-                        )}
-                        <span className="mx-2">•</span>
-                        <span>
-                          {getCategoryName(resource.category_id)}
-                          {resource.subcategory_id && (
-                            <>
-                              <span className="mx-1">/</span>
-                              <span>{getSubcategoryName(resource.subcategory_id)}</span>
-                            </>
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowActionsFor(showActionsFor === resource.id ? null : resource.id);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-2 hover:bg-gray-100 rounded-full transition-opacity"
-                      >
-                        <MoreVertical size={16} />
-                      </button>
-                      
-                      {showActionsFor === resource.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border">
-                          <div className="py-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingResource(resource);
-                                setShowEditModal(true);
-                                setShowActionsFor(null);
-                              }}
-                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              <Edit size={16} className="mr-2" />
-                              Edit
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (confirm('Are you sure you want to delete this resource?')) {
-                                  handleDeleteResource(resource.id, resource.category_id);
-                                }
-                                setShowActionsFor(null);
-                              }}
-                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                            >
-                              <Trash2 size={16} className="mr-2" />
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {selectedCategory && subcategories.filter(sub => sub.category_id === selectedCategory).length > 0 && (
+              <select
+                className="h-10 w-full sm:w-auto min-w-[200px] rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                value={selectedSubcategory || ""}
+                onChange={(e) => setSelectedSubcategory(e.target.value || null)}
+              >
+                <option value="">All Subcategories</option>
+                {subcategories
+                  .filter(sub => sub.category_id === selectedCategory)
+                  .map(subcategory => (
+                    <option key={subcategory.id} value={subcategory.id}>
+                      {subcategory.name}
+                    </option>
+                  ))
+                }
+              </select>
             )}
           </div>
         </div>
+
+        {/* Resources List */}
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          {isLoadingResources ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : sortedResources.length === 0 ? (
+            <div className="text-center py-12">
+              <Folder className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-medium">No resources found</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {selectedCategory
+                  ? "There are no resources in this category yet."
+                  : searchQuery
+                  ? "No resources match your search."
+                  : "There are no resources yet."}
+              </p>
+              <AppButton
+                onClick={() => setShowAddResourceModal(true)}
+                className="mt-4"
+              >
+                Add your first resource
+              </AppButton>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {sortedResources.map((resource) => (
+                <div
+                  key={resource.id}
+                  className="group flex items-start p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                  onClick={() => handleResourceClick(resource)}
+                >
+                  <div className="mr-4 mt-1 hidden sm:block">
+                    {resource.type === "document" ? (
+                      <File className="h-8 w-8 text-blue-500" />
+                    ) : resource.type === "spreadsheet" ? (
+                      <File className="h-8 w-8 text-green-500" />
+                    ) : (
+                      <Link className="h-8 w-8 text-purple-500" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h3 className="font-medium truncate">{resource.title}</h3>
+                        {resource.description && (
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                            {resource.description}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingResource(resource);
+                            setShowEditModal(true);
+                          }}
+                          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm('Are you sure you want to delete this resource?')) {
+                              handleDeleteResource(resource.id, resource.category_id);
+                            }
+                          }}
+                          className="p-2 hover:bg-gray-100 rounded-full transition-colors text-destructive"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center bg-muted px-2 py-1 rounded-full">
+                        {resource.type === "document" ? (
+                          <File className="h-3 w-3 mr-1 text-blue-500" />
+                        ) : resource.type === "spreadsheet" ? (
+                          <File className="h-3 w-3 mr-1 text-green-500" />
+                        ) : (
+                          <Link className="h-3 w-3 mr-1 text-purple-500" />
+                        )}
+                        {resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}
+                      </span>
+                      <span className="inline-flex items-center bg-muted px-2 py-1 rounded-full">
+                        <FolderOpen className="h-3 w-3 mr-1" />
+                        {getCategoryName(resource.category_id)}
+                        {resource.subcategory_id && (
+                          <>
+                            <span className="mx-1">/</span>
+                            <span>{getSubcategoryName(resource.subcategory_id)}</span>
+                          </>
+                        )}
+                      </span>
+                      {resource.file_size && (
+                        <span className="inline-flex items-center bg-muted px-2 py-1 rounded-full">
+                          {formatFileSize(resource.file_size)}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center bg-muted px-2 py-1 rounded-full">
+                        {new Date(resource.created_at).toLocaleDateString('en-GB')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-      
+
       <Modal
         isOpen={isAddCategoryModalOpen}
         onClose={() => setIsAddCategoryModalOpen(false)}

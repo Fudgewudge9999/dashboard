@@ -217,7 +217,7 @@ export function CalendarView() {
     
     // Add empty cells for days before the first day of month
     for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(<div key={`empty-${i}`} className="border-t border-l p-2 min-h-0"></div>);
+      days.push(<div key={`empty-${i}`} className="border-t border-l p-1 sm:p-2 min-h-[80px] sm:min-h-0"></div>);
     }
     
     // Add cells for each day of the month
@@ -231,7 +231,7 @@ export function CalendarView() {
       days.push(
         <div 
           key={day} 
-          className={`border-t border-l p-2 relative flex flex-col min-h-0 ${isToday ? 'bg-primary/5' : ''}`}
+          className={`border-t border-l p-1 sm:p-2 relative flex flex-col min-h-[80px] sm:min-h-0 ${isToday ? 'bg-primary/5' : ''}`}
         >
           <span className={`text-sm font-medium ${isToday ? 'text-primary' : ''}`}>{day}</span>
           
@@ -239,29 +239,37 @@ export function CalendarView() {
             {dayEvents.length > 2 ? (
               <>
                 {dayEvents.slice(0, 2).map(event => (
-                  <div 
+                  <button 
                     key={event.id} 
-                    className={`text-xs p-1 rounded truncate ${getCategoryColor(event.category)} cursor-pointer hover:opacity-80`}
+                    className={`w-full text-left text-xs p-1.5 sm:p-1 rounded truncate ${getCategoryColor(event.category)} cursor-pointer hover:opacity-80 active:opacity-70 touch-manipulation`}
                     title={`${event.title} (${event.startTime} - ${event.endTime})`}
                     onClick={() => handleEventClick(event)}
                   >
-                    {event.startTime.substring(0, 5)} - {event.title}
-                  </div>
+                    <span className="hidden sm:inline">{event.startTime.substring(0, 5)} - </span>
+                    {event.title}
+                  </button>
                 ))}
-                <div className="text-xs text-gray-500 px-1">
+                <button 
+                  className="w-full text-xs text-gray-500 px-1.5 py-1 hover:bg-gray-100 active:bg-gray-200 rounded touch-manipulation"
+                  onClick={() => {
+                    setViewMode("day");
+                    setCurrentDate(new Date(year, month, day));
+                  }}
+                >
                   + {dayEvents.length - 2} more
-                </div>
+                </button>
               </>
             ) : (
               dayEvents.map(event => (
-                <div 
+                <button 
                   key={event.id} 
-                  className={`text-xs p-1 rounded truncate ${getCategoryColor(event.category)} cursor-pointer hover:opacity-80`}
+                  className={`w-full text-left text-xs p-1.5 sm:p-1 rounded truncate ${getCategoryColor(event.category)} cursor-pointer hover:opacity-80 active:opacity-70 touch-manipulation`}
                   title={`${event.title} (${event.startTime} - ${event.endTime})`}
                   onClick={() => handleEventClick(event)}
                 >
-                  {event.startTime.substring(0, 5)} - {event.title}
-                </div>
+                  <span className="hidden sm:inline">{event.startTime.substring(0, 5)} - </span>
+                  {event.title}
+                </button>
               ))
             )}
           </div>
@@ -273,7 +281,7 @@ export function CalendarView() {
     const totalDays = firstDayOfMonth + daysInMonth;
     const remainingCells = 42 - totalDays; // 6 rows * 7 days = 42
     for (let i = 0; i < remainingCells; i++) {
-      days.push(<div key={`empty-end-${i}`} className="border-t border-l p-2 min-h-0"></div>);
+      days.push(<div key={`empty-end-${i}`} className="border-t border-l p-1 sm:p-2 min-h-[80px] sm:min-h-0"></div>);
     }
     
     return days;
@@ -291,25 +299,25 @@ export function CalendarView() {
       days.push(
         <div key={i} className="flex flex-col border-l h-full min-w-0">
           <div className={`p-2 text-center font-medium border-b ${isToday ? 'bg-primary/10' : ''}`}>
-            <div>{format(day, 'EEE')}</div>
-            <div className={`text-lg ${isToday ? 'text-primary' : ''}`}>{format(day, 'd')}</div>
+            <div className="text-sm">{format(day, 'EEE')}</div>
+            <div className={`text-base sm:text-lg ${isToday ? 'text-primary' : ''}`}>{format(day, 'd')}</div>
           </div>
           <div className="flex-1 overflow-y-auto p-2 space-y-2">
             {dayEvents.map(event => (
-              <div 
+              <button 
                 key={event.id} 
-                className={`text-xs p-2 rounded-md ${getCategoryColor(event.category)} mb-1 group relative cursor-pointer hover:opacity-80`}
+                className={`w-full text-left text-xs p-2 rounded-md ${getCategoryColor(event.category)} group relative cursor-pointer hover:opacity-80 active:opacity-70 touch-manipulation`}
                 onClick={() => handleEventClick(event)}
               >
                 <div className="font-medium">{event.title}</div>
                 <div className="text-xs">{event.startTime} - {event.endTime}</div>
-                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 sm:flex hidden">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleEditEvent(event);
                     }}
-                    className="p-1 hover:bg-black/10 rounded"
+                    className="p-1.5 hover:bg-black/10 rounded touch-manipulation"
                     title="Edit event"
                   >
                     <Pencil size={14} />
@@ -319,13 +327,13 @@ export function CalendarView() {
                       e.stopPropagation();
                       handleDeleteEvent(event.id);
                     }}
-                    className="p-1 hover:bg-black/10 rounded text-red-600"
+                    className="p-1.5 hover:bg-black/10 rounded text-red-600 touch-manipulation"
                     title="Delete event"
                   >
                     <Trash size={14} />
                   </button>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -370,9 +378,9 @@ export function CalendarView() {
       const height = (duration / 60) * 60;
       
       return (
-        <div 
+        <button 
           key={event.id} 
-          className={`absolute left-0 right-0 mx-2 p-2 rounded-md ${getCategoryColor(event.category)} group cursor-pointer hover:opacity-80 overflow-hidden`}
+          className={`absolute left-0 right-0 mx-2 p-2 rounded-md ${getCategoryColor(event.category)} group cursor-pointer hover:opacity-80 active:opacity-70 overflow-hidden touch-manipulation`}
           style={{
             top: `${top}px`,
             height: `${height}px`,
@@ -380,15 +388,15 @@ export function CalendarView() {
           }}
           onClick={() => handleEventClick(event)}
         >
-          <div className="font-medium truncate">{event.title}</div>
-          <div className="text-xs">{event.startTime} - {event.endTime}</div>
-          <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+          <div className="font-medium truncate text-sm">{event.title}</div>
+          <div className="text-xs truncate">{event.startTime} - {event.endTime}</div>
+          <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 sm:flex hidden">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleEditEvent(event);
               }}
-              className="p-1 hover:bg-black/10 rounded"
+              className="p-1.5 hover:bg-black/10 rounded touch-manipulation"
               title="Edit event"
             >
               <Pencil size={14} />
@@ -398,13 +406,13 @@ export function CalendarView() {
                 e.stopPropagation();
                 handleDeleteEvent(event.id);
               }}
-              className="p-1 hover:bg-black/10 rounded text-red-600"
+              className="p-1.5 hover:bg-black/10 rounded text-red-600 touch-manipulation"
               title="Delete event"
             >
               <Trash size={14} />
             </button>
           </div>
-        </div>
+        </button>
       );
     });
     
@@ -416,7 +424,7 @@ export function CalendarView() {
 
       hours.push(
         <div key={hour} className={`flex border-b min-h-[60px] ${isCurrentHour ? 'bg-primary/5' : ''}`}>
-          <div className="w-20 p-2 text-right text-sm border-r flex-shrink-0">
+          <div className="w-16 sm:w-20 p-2 text-right text-xs sm:text-sm border-r flex-shrink-0">
             {hourFormatted}
           </div>
           <div className="flex-grow relative">
@@ -431,7 +439,7 @@ export function CalendarView() {
       <div className="relative">
         {hours}
         {/* Overlay events on top of the time grid */}
-        <div className="absolute inset-0 ml-20">
+        <div className="absolute inset-0 ml-16 sm:ml-20">
           {eventElements}
         </div>
       </div>
@@ -589,11 +597,12 @@ export function CalendarView() {
 
   return (
     <div className="h-[calc(100vh-theme(spacing.20))] flex flex-col animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-3xl font-medium">Calendar</h1>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+        <h1 className="text-2xl sm:text-3xl font-medium">Calendar</h1>
         <AppButton 
           icon={<Plus size={18} />}
           onClick={() => setIsAddEventModalOpen(true)}
+          className="w-full sm:w-auto"
         >
           Add Event
         </AppButton>
@@ -607,46 +616,49 @@ export function CalendarView() {
           </div>
         ) : (
           <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-4">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <button 
                   onClick={goToPrevious}
-                  className="p-1 rounded-full hover:bg-secondary transition-colors"
+                  className="p-2 rounded-full hover:bg-secondary transition-colors"
                 >
                   <ChevronLeft size={20} />
                 </button>
-                <h2 className="text-xl font-medium">
+                <h2 className="text-lg sm:text-xl font-medium flex-1 text-center">
                   {getViewTitle()}
                 </h2>
                 <button 
                   onClick={goToNext}
-                  className="p-1 rounded-full hover:bg-secondary transition-colors"
+                  className="p-2 rounded-full hover:bg-secondary transition-colors"
                 >
                   <ChevronRight size={20} />
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 border rounded-md overflow-hidden">
+              <div className="flex items-center gap-2 border rounded-md overflow-hidden w-full sm:w-auto justify-center">
                 <button
                   onClick={() => setViewMode("month")}
-                  className={`p-2 flex items-center ${viewMode === "month" ? "bg-primary text-white" : "hover:bg-secondary"}`}
+                  className={`p-3 sm:p-2 flex-1 sm:flex-initial flex items-center justify-center ${viewMode === "month" ? "bg-primary text-white" : "hover:bg-secondary"}`}
                   title="Month view"
                 >
                   <CalendarDays size={18} />
+                  <span className="ml-2 sm:hidden">Month</span>
                 </button>
                 <button
                   onClick={() => setViewMode("week")}
-                  className={`p-2 flex items-center ${viewMode === "week" ? "bg-primary text-white" : "hover:bg-secondary"}`}
+                  className={`p-3 sm:p-2 flex-1 sm:flex-initial flex items-center justify-center ${viewMode === "week" ? "bg-primary text-white" : "hover:bg-secondary"}`}
                   title="Week view"
                 >
                   <CalendarIcon size={18} />
+                  <span className="ml-2 sm:hidden">Week</span>
                 </button>
                 <button
                   onClick={() => setViewMode("day")}
-                  className={`p-2 flex items-center ${viewMode === "day" ? "bg-primary text-white" : "hover:bg-secondary"}`}
+                  className={`p-3 sm:p-2 flex-1 sm:flex-initial flex items-center justify-center ${viewMode === "day" ? "bg-primary text-white" : "hover:bg-secondary"}`}
                   title="Day view"
                 >
                   <List size={18} />
+                  <span className="ml-2 sm:hidden">Day</span>
                 </button>
               </div>
             </div>
@@ -657,8 +669,9 @@ export function CalendarView() {
                   {/* Weekday headers */}
                   <div className="col-span-7 grid grid-cols-7">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day} className="p-2 text-center font-medium text-sm border-t border-l">
-                        {day}
+                      <div key={day} className="p-2 text-center font-medium text-xs sm:text-sm border-t border-l">
+                        <span className="hidden sm:inline">{day}</span>
+                        <span className="sm:hidden">{day.charAt(0)}</span>
                       </div>
                     ))}
                   </div>
@@ -671,14 +684,16 @@ export function CalendarView() {
               )}
 
               {viewMode === "week" && (
-                <div className="h-full">
-                  {renderWeekView()}
+                <div className="h-full overflow-x-auto">
+                  <div className="min-w-[800px]">
+                    {renderWeekView()}
+                  </div>
                 </div>
               )}
               
               {viewMode === "day" && (
                 <div className="h-full overflow-hidden flex flex-col">
-                  <div className="p-3 text-xl font-medium border-b flex-shrink-0">
+                  <div className="p-3 text-base sm:text-xl font-medium border-b flex-shrink-0">
                     {format(currentDate, 'EEEE, MMMM d, yyyy')}
                     {isSameDay(currentDate, new Date()) && <span className="ml-2 text-primary text-sm">Today</span>}
                   </div>

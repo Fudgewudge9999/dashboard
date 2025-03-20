@@ -576,15 +576,15 @@ export function TasksView() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-medium">Tasks</h1>
-        <div className="flex gap-2">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-medium">Tasks</h1>
+        <div className="flex gap-2 w-full sm:w-auto">
           {isCompletedFilter && tasks.filter(t => t.status === 'completed').length > 0 && (
             <AppButton 
               variant="outline"
               onClick={clearCompletedTasks}
-              className="text-destructive border-destructive hover:bg-destructive/10"
+              className="text-destructive border-destructive hover:bg-destructive/10 flex-1 sm:flex-initial"
             >
               Clear All Completed
             </AppButton>
@@ -595,14 +595,15 @@ export function TasksView() {
               setEditingTask(null);
               setIsTaskModalOpen(true);
             }}
+            className="flex-1 sm:flex-initial"
           >
             Add Task
           </AppButton>
         </div>
       </div>
       
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
+      <div className="flex flex-col gap-4">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
           <input 
             type="text" 
@@ -612,17 +613,18 @@ export function TasksView() {
             className="w-full pl-10 pr-4 py-2 rounded-md border border-input focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
+        <div className="grid grid-cols-2 sm:flex gap-2">
           <AppButton 
             variant={activeFilter === "all" ? "primary" : "outline"} 
             onClick={() => setActiveFilter("all")}
+            className="w-full sm:w-auto"
           >
             All
           </AppButton>
           <AppButton 
             variant={activeFilter === "overdue" ? "primary" : "outline"}
             onClick={() => setActiveFilter("overdue")}
-            className="whitespace-nowrap"
+            className="w-full sm:w-auto whitespace-nowrap"
           >
             <Clock size={16} className="mr-1" />
             Overdue
@@ -630,73 +632,19 @@ export function TasksView() {
           <AppButton 
             variant={activeFilter === "today" ? "primary" : "outline"}
             onClick={() => setActiveFilter("today")}
+            className="w-full sm:w-auto"
           >
             Today
           </AppButton>
           <AppButton 
             variant={activeFilter === "upcoming" ? "primary" : "outline"}
             onClick={() => setActiveFilter("upcoming")}
+            className="w-full sm:w-auto"
           >
             Upcoming
           </AppButton>
-          <AppButton 
-            variant={activeFilter === "completed" ? "primary" : "outline"}
-            onClick={() => setActiveFilter("completed")}
-            className="whitespace-nowrap"
-          >
-            <CheckCheck size={16} className="mr-1" />
-            Completed
-            {tasks.filter(t => t.status === 'completed').length > 0 && (
-              <span className={`ml-1.5 px-1.5 py-0.5 text-xs rounded-full ${
-                isCompletedFilter 
-                  ? "bg-white text-primary" 
-                  : "bg-primary text-white"
-              }`}>
-                {tasks.filter(t => t.status === 'completed').length}
-              </span>
-            )}
-          </AppButton>
         </div>
       </div>
-      
-      {activeFilter === 'completed' && tasks.filter(t => t.status === 'completed').length > 0 && (
-        <div className="flex justify-end">
-          <div className="relative" ref={sortDropdownRef}>
-            <button 
-              onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-            >
-              Sort by: <span className="font-medium">{completedSort === 'newest' ? 'Recently Completed' : 'Oldest First'}</span>
-              <ChevronDown size={14} />
-            </button>
-            
-            {showSortDropdown && (
-              <div className="absolute right-0 mt-1 w-48 bg-white shadow-lg rounded-md border border-input z-10">
-                <div className="py-1">
-                  <button
-                    className={`w-full text-left px-4 py-2 text-sm ${completedSort === 'newest' ? 'bg-muted font-medium' : 'hover:bg-muted'}`}
-                    onClick={() => {
-                      setCompletedSort('newest');
-                      setShowSortDropdown(false);
-                    }}
-                  >
-                    Recently Completed
-                  </button>
-                  <button
-                    className={`w-full text-left px-4 py-2 text-sm ${completedSort === 'oldest' ? 'bg-muted font-medium' : 'hover:bg-muted'}`}
-                    onClick={() => {
-                      setCompletedSort('oldest');
-                      setShowSortDropdown(false);
-                    }}
-                  >
-                    Oldest First
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
       
       {isCompletedFilter && tasks.filter(t => t.status === 'completed').length > 0 && (
         <div className="mb-4">
@@ -762,7 +710,7 @@ export function TasksView() {
                 <AccordionContent>
                   <div className="divide-y">
                     {dateTasks.map(task => (
-                      <div key={task.id} className="py-4 animate-slide-up">
+                      <div key={task.id} className="p-4 animate-slide-up">
                         <div className="flex items-start gap-3">
                           <button
                             onClick={() => toggleTaskCompletion(task.id, task.status)}
@@ -774,18 +722,18 @@ export function TasksView() {
                             }
                           </button>
                           
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                               <button 
                                 onClick={() => setExpandedTasks(prev => ({ ...prev, [task.id]: !prev[task.id] }))}
-                                className="flex items-center gap-2 hover:text-primary transition-colors"
+                                className="flex items-center gap-2 hover:text-primary transition-colors w-full"
                               >
                                 {expandedTasks[task.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                                <h3 className={`font-medium ${task.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
+                                <h3 className={`font-medium ${task.status === 'completed' ? 'line-through text-muted-foreground' : ''} ${expandedTasks[task.id] ? '' : 'truncate'}`}>
                                   {task.title}
                                 </h3>
                               </button>
-                              <div className="flex gap-2">
+                              <div className="flex flex-wrap gap-2">
                                 <Badge 
                                   variant="secondary" 
                                   className={priorityLabels[task.priority as keyof typeof priorityLabels].class}
@@ -801,7 +749,7 @@ export function TasksView() {
                             </div>
                             
                             {task.description && (
-                              <p className="text-sm text-muted-foreground mt-1">
+                              <p className={`text-sm text-muted-foreground mt-2 ${expandedTasks[task.id] ? '' : 'line-clamp-2'}`}>
                                 {task.description}
                               </p>
                             )}
@@ -820,72 +768,79 @@ export function TasksView() {
 
                             {/* Subtasks section */}
                             {expandedTasks[task.id] && (
-                              <div className="mt-4 space-y-2 pl-6 border-l-2 border-gray-100">
-                                {task.subtasks?.map(subtask => (
-                                  <div key={subtask.id} className="flex items-center gap-2 group">
-                                    <button
-                                      onClick={() => toggleSubtaskCompletion(task.id, subtask.id, subtask.status)}
-                                      className="flex-shrink-0 text-muted-foreground hover:text-primary transition-colors"
-                                    >
-                                      {subtask.status === 'completed' 
-                                        ? <CheckCircle2 size={16} className="text-primary" /> 
-                                        : <Circle size={16} />
-                                      }
-                                    </button>
-                                    <span className={`flex-1 text-sm ${subtask.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
-                                      {subtask.title}
-                                    </span>
-                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <button
-                                        onClick={() => {
-                                          setEditingSubtask(subtask);
-                                          setIsSubtaskModalOpen(true);
-                                        }}
-                                        className="text-muted-foreground hover:text-primary transition-colors"
-                                        aria-label={`Edit ${subtask.title} subtask`}
-                                      >
-                                        <Pencil size={14} />
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteSubtask(task.id, subtask.id)}
-                                        className="text-muted-foreground hover:text-destructive transition-colors"
-                                        aria-label={`Delete ${subtask.title} subtask`}
-                                      >
-                                        <X size={14} />
-                                      </button>
-                                    </div>
-                                  </div>
-                                ))}
-                                
-                                <button
-                                  onClick={() => {
-                                    setActiveTaskForSubtask(task.id);
-                                    setIsSubtaskModalOpen(true);
-                                  }}
-                                  className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
-                                >
-                                  <Plus size={14} />
-                                  <span>Add Subtask</span>
-                                </button>
+                              <div className="mt-4 space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="text-sm font-medium text-muted-foreground">Subtasks</h4>
+                                  <button
+                                    onClick={() => {
+                                      setActiveTaskForSubtask(task.id);
+                                      setIsSubtaskModalOpen(true);
+                                    }}
+                                    className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+                                  >
+                                    <Plus size={14} />
+                                    Add Subtask
+                                  </button>
+                                </div>
+                                <div className="space-y-2 pl-4 sm:pl-6 border-l-2 border-gray-100">
+                                  {task.subtasks && task.subtasks.length > 0 ? (
+                                    task.subtasks.map(subtask => (
+                                      <div key={subtask.id} className="flex items-center gap-2 group">
+                                        <button
+                                          onClick={() => toggleSubtaskCompletion(task.id, subtask.id, subtask.status)}
+                                          className="flex-shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                                        >
+                                          {subtask.status === 'completed' 
+                                            ? <CheckCircle2 size={16} className="text-primary" /> 
+                                            : <Circle size={16} />
+                                          }
+                                        </button>
+                                        <span className={`flex-1 text-sm ${subtask.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
+                                          {subtask.title}
+                                        </span>
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                                          <button
+                                            onClick={() => {
+                                              setEditingSubtask(subtask);
+                                              setIsSubtaskModalOpen(true);
+                                            }}
+                                            className="p-1 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-gray-100"
+                                            aria-label={`Edit ${subtask.title} subtask`}
+                                          >
+                                            <Pencil size={12} />
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteSubtask(task.id, subtask.id)}
+                                            className="p-1 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-gray-100"
+                                            aria-label={`Delete ${subtask.title} subtask`}
+                                          >
+                                            <X size={12} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <p className="text-sm text-muted-foreground italic">No subtasks yet</p>
+                                  )}
+                                </div>
                               </div>
                             )}
                           </div>
                           
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 sm:gap-3">
                             <button
                               onClick={() => {
                                 setEditingTask(task);
                                 setIsTaskModalOpen(true);
                               }}
-                              className="text-muted-foreground hover:text-primary transition-colors"
-                              aria-label={`Edit ${task.title} task`}
+                              className="p-1.5 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-gray-100"
                             >
                               <Pencil size={16} />
                             </button>
                             {task.status === 'completed' && (
                               <button
                                 onClick={() => toggleTaskCompletion(task.id, task.status)}
-                                className="text-muted-foreground hover:text-green-600 transition-colors"
+                                className="p-1.5 text-muted-foreground hover:text-green-600 transition-colors rounded-md hover:bg-gray-100"
                                 aria-label={`Restore ${task.title} task`}
                                 title="Restore task"
                               >
@@ -897,7 +852,7 @@ export function TasksView() {
                             )}
                             <button
                               onClick={() => handleDeleteTask(task.id)}
-                              className="text-muted-foreground hover:text-destructive transition-colors"
+                              className="p-1.5 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-gray-100"
                               aria-label={`Delete ${task.title} task`}
                             >
                               <X size={16} />
@@ -914,7 +869,7 @@ export function TasksView() {
         ) : (
           <div className="divide-y">
             {filteredTasks.map(task => (
-              <div key={task.id} className="py-4 animate-slide-up">
+              <div key={task.id} className="p-4 animate-slide-up">
                 <div className="flex items-start gap-3">
                   <button
                     onClick={() => toggleTaskCompletion(task.id, task.status)}
@@ -926,18 +881,18 @@ export function TasksView() {
                     }
                   </button>
                   
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                       <button 
                         onClick={() => setExpandedTasks(prev => ({ ...prev, [task.id]: !prev[task.id] }))}
-                        className="flex items-center gap-2 hover:text-primary transition-colors"
+                        className="flex items-center gap-2 hover:text-primary transition-colors w-full"
                       >
                         {expandedTasks[task.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                        <h3 className={`font-medium ${task.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
+                        <h3 className={`font-medium ${task.status === 'completed' ? 'line-through text-muted-foreground' : ''} ${expandedTasks[task.id] ? '' : 'truncate'}`}>
                           {task.title}
                         </h3>
                       </button>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <Badge 
                           variant="secondary" 
                           className={priorityLabels[task.priority as keyof typeof priorityLabels].class}
@@ -958,7 +913,7 @@ export function TasksView() {
                     </div>
                     
                     {task.description && (
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className={`text-sm text-muted-foreground mt-2 ${expandedTasks[task.id] ? '' : 'line-clamp-2'}`}>
                         {task.description}
                       </p>
                     )}
@@ -981,64 +936,72 @@ export function TasksView() {
 
                     {/* Subtasks section */}
                     {expandedTasks[task.id] && (
-                      <div className="mt-4 space-y-2 pl-6 border-l-2 border-gray-100">
-                        {task.subtasks?.map(subtask => (
-                          <div key={subtask.id} className="flex items-center gap-2 group">
-                            <button
-                              onClick={() => toggleSubtaskCompletion(task.id, subtask.id, subtask.status)}
-                              className="flex-shrink-0 text-muted-foreground hover:text-primary transition-colors"
-                            >
-                              {subtask.status === 'completed' 
-                                ? <CheckCircle2 size={16} className="text-primary" /> 
-                                : <Circle size={16} />
-                              }
-                            </button>
-                            <span className={`flex-1 text-sm ${subtask.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
-                              {subtask.title}
-                            </span>
-                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button
-                                onClick={() => {
-                                  setEditingSubtask(subtask);
-                                  setIsSubtaskModalOpen(true);
-                                }}
-                                className="text-muted-foreground hover:text-primary transition-colors"
-                                aria-label={`Edit ${subtask.title} subtask`}
-                              >
-                                <Pencil size={14} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteSubtask(task.id, subtask.id)}
-                                className="text-muted-foreground hover:text-destructive transition-colors"
-                                aria-label={`Delete ${subtask.title} subtask`}
-                              >
-                                <X size={14} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                        
-                        <button
-                          onClick={() => {
-                            setActiveTaskForSubtask(task.id);
-                            setIsSubtaskModalOpen(true);
-                          }}
-                          className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
-                        >
-                          <Plus size={14} />
-                          <span>Add Subtask</span>
-                        </button>
+                      <div className="mt-4 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-medium text-muted-foreground">Subtasks</h4>
+                          <button
+                            onClick={() => {
+                              setActiveTaskForSubtask(task.id);
+                              setIsSubtaskModalOpen(true);
+                            }}
+                            className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+                          >
+                            <Plus size={14} />
+                            Add Subtask
+                          </button>
+                        </div>
+                        <div className="space-y-2 pl-4 sm:pl-6 border-l-2 border-gray-100">
+                          {task.subtasks && task.subtasks.length > 0 ? (
+                            task.subtasks.map(subtask => (
+                              <div key={subtask.id} className="flex items-center gap-2 group">
+                                <button
+                                  onClick={() => toggleSubtaskCompletion(task.id, subtask.id, subtask.status)}
+                                  className="flex-shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                                >
+                                  {subtask.status === 'completed' 
+                                    ? <CheckCircle2 size={16} className="text-primary" /> 
+                                    : <Circle size={16} />
+                                  }
+                                </button>
+                                <span className={`flex-1 text-sm ${subtask.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
+                                  {subtask.title}
+                                </span>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                                  <button
+                                    onClick={() => {
+                                      setEditingSubtask(subtask);
+                                      setIsSubtaskModalOpen(true);
+                                    }}
+                                    className="p-1 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-gray-100"
+                                    aria-label={`Edit ${subtask.title} subtask`}
+                                  >
+                                    <Pencil size={12} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteSubtask(task.id, subtask.id)}
+                                    className="p-1 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-gray-100"
+                                    aria-label={`Delete ${subtask.title} subtask`}
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground italic">No subtasks yet</p>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 sm:gap-3">
                     <button
                       onClick={() => {
                         setEditingTask(task);
                         setIsTaskModalOpen(true);
                       }}
-                      className="text-muted-foreground hover:text-primary transition-colors"
+                      className="p-1.5 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-gray-100"
                       aria-label={`Edit ${task.title} task`}
                     >
                       <Pencil size={16} />
@@ -1046,7 +1009,7 @@ export function TasksView() {
                     {task.status === 'completed' && (
                       <button
                         onClick={() => toggleTaskCompletion(task.id, task.status)}
-                        className="text-muted-foreground hover:text-green-600 transition-colors"
+                        className="p-1.5 text-muted-foreground hover:text-green-600 transition-colors rounded-md hover:bg-gray-100"
                         aria-label={`Restore ${task.title} task`}
                         title="Restore task"
                       >
@@ -1058,7 +1021,7 @@ export function TasksView() {
                     )}
                     <button
                       onClick={() => handleDeleteTask(task.id)}
-                      className="text-muted-foreground hover:text-destructive transition-colors"
+                      className="p-1.5 text-muted-foreground hover:text-destructive transition-colors rounded-md hover:bg-gray-100"
                       aria-label={`Delete ${task.title} task`}
                     >
                       <X size={16} />

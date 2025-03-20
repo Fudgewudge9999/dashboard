@@ -24,15 +24,21 @@ interface SidebarLinkProps {
   icon: React.ElementType;
   label: string;
   isCollapsed: boolean;
+  onClick?: () => void;
 }
 
-function SidebarLink({ to, icon: Icon, label, isCollapsed }: SidebarLinkProps) {
+interface SidebarProps {
+  onMobileClose?: () => void;
+}
+
+function SidebarLink({ to, icon: Icon, label, isCollapsed, onClick }: SidebarLinkProps) {
   const location = useLocation();
   const isActive = location.pathname === to;
 
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       className={({ isActive }) =>
         cn(
           "flex items-center rounded-md transition-all duration-250 group",
@@ -53,12 +59,18 @@ function SidebarLink({ to, icon: Icon, label, isCollapsed }: SidebarLinkProps) {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ onMobileClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user } = useAuth();
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const handleLinkClick = () => {
+    if (onMobileClose) {
+      onMobileClose();
+    }
   };
 
   const sidebarLinks = [
@@ -76,9 +88,10 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "h-screen sticky top-0 bg-background border-r",
+        "h-screen sticky top-0 bg-background border-r z-50",
         "transition-all duration-300 ease-in-out",
-        isCollapsed ? "w-[70px]" : "w-[240px]"
+        isCollapsed ? "w-[70px]" : "w-[240px]",
+        "lg:w-auto"
       )}
     >
       <div className="flex flex-col h-full">
@@ -93,7 +106,7 @@ export function Sidebar() {
           )}
           <button
             onClick={toggleSidebar}
-            className="p-1 rounded-md text-foreground/70 hover:bg-accent hover:text-foreground transition-colors"
+            className="p-1 rounded-md text-foreground/70 hover:bg-accent hover:text-foreground transition-colors lg:flex hidden"
           >
             {isCollapsed ? (
               <Menu size={20} />
@@ -111,6 +124,7 @@ export function Sidebar() {
               icon={link.icon}
               label={link.label}
               isCollapsed={isCollapsed}
+              onClick={handleLinkClick}
             />
           ))}
         </nav>
@@ -124,6 +138,7 @@ export function Sidebar() {
             icon={Settings}
             label="Settings"
             isCollapsed={isCollapsed}
+            onClick={handleLinkClick}
           />
           
           {user ? (
@@ -132,6 +147,7 @@ export function Sidebar() {
               icon={User}
               label="Profile"
               isCollapsed={isCollapsed}
+              onClick={handleLinkClick}
             />
           ) : (
             <SidebarLink
@@ -139,6 +155,7 @@ export function Sidebar() {
               icon={LogIn}
               label="Login"
               isCollapsed={isCollapsed}
+              onClick={handleLinkClick}
             />
           )}
         </div>
